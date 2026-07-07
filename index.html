@@ -1,1 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>System Update...</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            user-select: none;
+        }
 
+        /* Initial hidden state to trick the user */
+        #start-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            font-family: sans-serif;
+            text-align: center;
+            background: #fff;
+            color: #000;
+            cursor: pointer;
+        }
+
+        #hacker-screen {
+            display: none;
+            padding: 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #console-output {
+            flex-grow: 1;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .line {
+            margin-bottom: 2px;
+        }
+
+        .warning { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+        .success { color: #00ff00; }
+        .system { color: #00ffff; }
+
+        /* Fake Progress Bar */
+        #progress-container {
+            margin-top: 10px;
+            border: 1px solid #00ff00;
+            width: 100%;
+            height: 20px;
+            position: relative;
+            display: none;
+        }
+
+        #progress-bar {
+            background-color: #00ff00;
+            height: 100%;
+            width: 0%;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        #progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 2px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Final Lock Screen */
+        #lock-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #ff0000;
+            color: #fff;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 1000;
+            animation: flash 0.5s infinite alternate;
+        }
+
+        #lock-screen h1 { font-size: 3rem; margin-bottom: 10px; }
+        #lock-screen p { font-size: 1.5rem; }
+
+        @keyframes flash {
+            from { background-color: #aa0000; }
+            to { background-color: #ff0000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" onclick="startHack()">
+        <div>
+            <h2>Tap to Claim Free Reward 🎁</h2>
+            <p>Click anywhere to continue...</p>
+        </div>
+    </div>
+
+    <div id="hacker-screen" style="display: none;">
+        <div id="console-output"></div>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+            <div id="progress-text">DOWNLOADING PAYLOAD... 0%</div>
+        </div>
+    </div>
+
+    <div id="lock-screen">
+        <h1>SYSTEM COMPROMISED</h1>
+        <p>ALL LOCAL DATA ENCRYPTED.</p>
+        <p>DEVICE LOCK INITIATED.</p>
+    </div>
+
+    <script>
+        const consoleOutput = document.getElementById('console-output');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const progressContainer = document.getElementById('progress-container');
+        const lockScreen = document.getElementById('lock-screen');
+
+        // Scary technical-sounding phrases
+        const hackPhrases = [
+            "<span class='system'>[SYSTEM] Establishing remote connection...</span>",
+            "<span class='success'>[OK] Connection established on port 443.</span>",
+            "Bypassing firewall protocols...",
+            "<span class='warning'>[WARNING] Intrusion detection triggered!</span>",
+            "Disabling local security daemon...",
+            "<span class='success'>[OK] Local security disabled.</span>",
+            "Scanning directory /storage/emulated/0/DCIM/Camera...",
+            "Found 3,402 media files.",
+            "Extracting Whatsapp database...",
+            "Decrypting msgstore.db.crypt14...",
+            "<span class='warning'>[ALERT] Admin privileges escalated. Root access granted.</span>",
+            "Injecting keylogger payload...",
+            "Cloning local address book...",
+            "<span class='system'>[SYSTEM] Uploading data to remote server: 192.168.1.104...</span>"
+        ];
+
+        let lineIndex = 0;
+
+        function startHack() {
+            // Hide fake start, show terminal
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('hacker-screen').style.display = 'flex';
+
+            // Force Fullscreen to make it feel like they lost control
+            let docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            } else if (docElm.webkitRequestFullScreen) {
+                docElm.webkitRequestFullScreen();
+            }
+
+            // Start typing lines
+            typeLines();
+        }
+
+        function typeLines() {
+            if (lineIndex < hackPhrases.length) {
+                const newLine = document.createElement('div');
+                newLine.className = 'line';
+                newLine.innerHTML = hackPhrases[lineIndex];
+                consoleOutput.appendChild(newLine);
+                
+                // Auto-scroll to bottom
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                
+                lineIndex++;
+                
+                // Random delay between lines to look realistic (100ms to 800ms)
+                setTimeout(typeLines, Math.random() * 700 + 100);
+            } else {
+                // When text finishes, start the fake download bar
+                startDownload();
+            }
+        }
+
+        function startDownload() {
+            progressContainer.style.display = 'block';
+            let width = 0;
+            
+            const downloadInterval = setInterval(() => {
+                // Random jumps in progress
+                width += Math.random() * 5; 
+                if (width >= 100) width = 100;
+                
+                progressBar.style.width = width + '%';
+                progressText.innerText = `DOWNLOADING MALWARE... ${Math.floor(width)}%`;
+
+                if (width >= 100) {
+                    clearInterval(downloadInterval);
+                    setTimeout(showLockScreen, 500);
+                }
+            }, 150);
+        }
+
+        function showLockScreen() {
+            document.getElementById('hacker-screen').style.display = 'none';
+            lockScreen.style.display = 'flex';
+            
+            // Vibrate phone if supported for extra panic
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 1000]);
+            }
+        }
+
+        // Prevent right click and keyboard shortcuts to make it harder to close
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.key === "F12" || e.key === "Escape") {
+                return false;
+            }
+        };
+    </script>
+</body>
+</html>
